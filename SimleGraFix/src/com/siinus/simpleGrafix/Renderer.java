@@ -6,14 +6,13 @@ import com.siinus.simpleGrafix.gfx.ImageTile;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
-import java.awt.*;
 import java.awt.image.DataBufferInt;
-import java.io.IOException;
 import java.util.Arrays;
 
 public class Renderer {
-    private int width, height;
-    private int[] pixels;
+    protected int width, height;
+    protected int[] pixels;
+    protected int bgColor;
 
     public Renderer(Window window) {
         width = window.getWidth();
@@ -22,15 +21,30 @@ public class Renderer {
     }
 
     public void clear() {
-        Arrays.fill(pixels, 0);
+        Arrays.fill(pixels, bgColor);
     }
 
+    public void process() { }
+
     public void setPixel(int x, int y, int value) {
-        if ((x < 0 || x >= width || y < 0 || y >= height) || (value >> 6 & 0xff) == 0) {
+        int alpha = ((value >> 24) & 0xff);
+
+        if ((x < 0 || x >= width || y < 0 || y >= height) || alpha == 0) {
             return;
         }
 
-        pixels[x + y * (width)] = value;
+        if (alpha == 0xff) {
+            pixels[x + y * (width)] = value;
+            return;
+        }
+
+        int pColor = pixels[x+ +y * width];
+
+        int r = ((pColor >> 16) & 0xff) - (int) ((((pColor >> 16) & 0xff) - ((value >> 16) & 0xff)) * (alpha / 255.0f));
+        int g = ((pColor >> 8) & 0xff) - (int) ((((pColor >> 8) & 0xff) - ((value >> 8) & 0xff)) * (alpha / 255.0f));
+        int b = ((pColor) & 0xff) - (int) ((((pColor) & 0xff) - ((value) & 0xff)) * (alpha / 255.0f));
+
+        pixels[x + y * width] = (r << 16 | g << 8 | b);
     }
 
     public void drawImage(@NotNull Image image, int offX, int offY) {
@@ -42,7 +56,7 @@ public class Renderer {
     }
 
     public void drawText(@NotNull String text, int offX, int offY, int color, @Nullable Font font) {
-        font = font==null?Font.STANDARD:font;
+        font = font==null?Font.getStandard():font;
         Image fontImage = font.getFontImage();
 
         int x = offX;
@@ -50,17 +64,18 @@ public class Renderer {
         for (char c : text.toCharArray()) {
             if (c=='\n') {
                 y+=font.getSize()+5;
+                x = offX;
             }
-            if (c<0x20 || c>font.getChars()+0x20) {
+            if (c<font.getStartChar() || c>font.getChars()+font.getStartChar()) {
                 continue;
             }
             Font finalFont = font;
-            draw(x, y, font.getWidths()[c-0x20], font.getSize(), ((x1, y1) -> fontImage.getPixels()[x1 + finalFont.getOffsets()[c-0x20] + y1 * fontImage.getWidth()]==0xffffffff?color:0));
-            x += font.getWidths()[c-0x20]+1;
+            draw(x, y, font.getWidths()[c-font.getStartChar()], font.getImageSize(), ((x1, y1) -> fontImage.getPixels()[x1 + finalFont.getOffsets()[c- finalFont.getStartChar()] + y1 * fontImage.getWidth()]==0xffffffff?color:0));
+            x += font.getWidths()[c-font.getStartChar()]+1;
         }
     }
 
-    private void draw(int offX, int offY, int width, int height, PixelIndexer pixelIndex) {
+    protected void draw(int offX, int offY, int width, int height, PixelIndexer pixelIndex) {
         for (int y = 0; y < height; y++) {
             for (int x = 0; x < width; x++) {
                 setPixel(x + offX, y + offY, pixelIndex.get(x, y));
@@ -68,8 +83,16 @@ public class Renderer {
         }
     }
 
+    public int getBgColor() {
+        return bgColor;
+    }
+
+    public void setBgColor(int bgColor) {
+        this.bgColor = bgColor;
+    }
+
     @FunctionalInterface
-    private static interface PixelIndexer {
+    protected static interface PixelIndexer {
         public int get(int x, int y);
     }
 }

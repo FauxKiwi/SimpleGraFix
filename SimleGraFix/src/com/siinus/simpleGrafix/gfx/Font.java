@@ -4,18 +4,29 @@ import java.awt.*;
 import java.awt.image.BufferedImage;
 
 public class Font {
-    public static final Font STANDARD = new Font("/standard.png",0x5f, 16);
+    private static Font STANDARD = new Font("/arial16.png",16, 19);
+    public static final Font ARIAL16 = new Font("/arial16.png",16, 19);
+    public static final Font ARIAL32 = new Font("/arial32.png",32, 37);
+    public static final Font ALGERIAN32 = new Font("/algerian32.png",32, 37);
 
     private int chars;
     private int size;
+    private int imageSize;
+    private char startChar;
 
     private Image fontImage;
     private int[] offsets;
     private int[] widths;
 
-    public Font(String path, int chars, int size) {
+    public Font(String path, int size, int imageSize) {
+        this(path, 0x100, size, imageSize, '\0');
+    }
+
+    public Font(String path, int chars, int size, int imageSize, char startChar) {
         this.chars = chars;
         this.size = size;
+        this.imageSize = imageSize;
+        this.startChar = startChar;
 
         fontImage = new Image(path);
 
@@ -53,6 +64,14 @@ public class Font {
         return size;
     }
 
+    public int getImageSize() {
+        return imageSize;
+    }
+
+    public char getStartChar() {
+        return startChar;
+    }
+
     public Image getFontImage() {
         return fontImage;
     }
@@ -63,5 +82,13 @@ public class Font {
 
     public int[] getOffsets() {
         return offsets;
+    }
+
+    public static Font getStandard() {
+        return STANDARD;
+    }
+
+    public static void setStandard(Font standard) {
+        STANDARD = standard;
     }
 }

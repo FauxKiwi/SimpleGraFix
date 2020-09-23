@@ -79,6 +79,7 @@ public class GameLoop implements Runnable {
                 renderer.clear();
 
                 program.render();
+                renderer.process();
 
                 window.update();
 
@@ -106,5 +107,13 @@ public class GameLoop implements Runnable {
 
     public Renderer getRenderer() {
         return renderer;
+    }
+
+    public void setWindow(Window window) {
+        this.window = window;
+    }
+
+    public void setRenderer(Renderer renderer) {
+        this.renderer = renderer;
     }
 }
