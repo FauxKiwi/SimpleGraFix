@@ -3,7 +3,6 @@ package com.siinus.simpleGrafix.input;
 import com.siinus.simpleGrafix.Window;
 
 import java.awt.event.*;
-import java.util.Arrays;
 
 public class Input implements KeyListener, MouseListener, MouseMotionListener, MouseWheelListener {
     private Window window;
@@ -11,10 +10,12 @@ public class Input implements KeyListener, MouseListener, MouseMotionListener, M
     public static final int KEYS = 256;
     private boolean[] keys = new boolean[KEYS];
     private boolean[] keysLast = new boolean[KEYS];
+    private boolean keyDown = false;
 
     public static final int BUTTONS = 3;
     private boolean[] buttons = new boolean[BUTTONS];
     private boolean[] buttonsLast = new boolean[BUTTONS];
+    private boolean buttonDown = false;
 
     private int mouseX, mouseY;
     private int scroll;
@@ -43,11 +44,13 @@ public class Input implements KeyListener, MouseListener, MouseMotionListener, M
 
     @Override
     public void keyPressed(KeyEvent e) {
+        keyDown = true;
         keys[e.getKeyCode()] = true;
     }
 
     @Override
     public void keyReleased(KeyEvent e) {
+        keyDown = false;
         keys[e.getKeyCode()] = false;
     }
 
@@ -58,11 +61,13 @@ public class Input implements KeyListener, MouseListener, MouseMotionListener, M
 
     @Override
     public void mousePressed(MouseEvent e) {
+        buttonDown = true;
         buttons[e.getButton()] = true;
     }
 
     @Override
     public void mouseReleased(MouseEvent e) {
+        buttonDown = false;
         buttons[e.getButton()] = false;
     }
 
@@ -100,6 +105,8 @@ public class Input implements KeyListener, MouseListener, MouseMotionListener, M
         return mouseY;
     }
 
+    /* -------------------- User-relevant Methods ------------------------ */
+
     public boolean isKeyPressed(int keyCode) {
         return keys[keyCode];
     }
@@ -122,5 +129,17 @@ public class Input implements KeyListener, MouseListener, MouseMotionListener, M
 
     public boolean isButtonUp(int button) {
         return !buttons[button] && buttonsLast[button];
+    }
+
+    public int getScroll() {
+        return scroll;
+    }
+
+    public boolean isKeyDown() {
+        return keyDown;
+    }
+
+    public boolean isButtonDown() {
+        return buttonDown;
     }
 }
