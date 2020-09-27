@@ -15,8 +15,8 @@ public class Renderer {
     protected int bgColor;
 
     public Renderer(Window window) {
-        width = window.getWidth();
-        height = window.getHeight();
+        width = (int) (window.getWidth() / window.getScale());
+        height = (int) (window.getHeight() / window.getScale());
         pixels = ((DataBufferInt) window.getImage().getRaster().getDataBuffer()).getData();
     }
 
@@ -27,6 +27,10 @@ public class Renderer {
     public void process() { }
 
     public void setPixel(int x, int y, int value) {
+        if ((x + y * width) >= pixels.length) {
+            return;
+        }
+
         int alpha = ((value >> 24) & 0xff);
 
         if ((x < 0 || x >= width || y < 0 || y >= height) || alpha == 0) {
@@ -38,7 +42,7 @@ public class Renderer {
             return;
         }
 
-        int pColor = pixels[x+ +y * width];
+        int pColor = pixels[x + y * width];
 
         int r = ((pColor >> 16) & 0xff) - (int) ((((pColor >> 16) & 0xff) - ((value >> 16) & 0xff)) * (alpha / 255.0f));
         int g = ((pColor >> 8) & 0xff) - (int) ((((pColor >> 8) & 0xff) - ((value >> 8) & 0xff)) * (alpha / 255.0f));

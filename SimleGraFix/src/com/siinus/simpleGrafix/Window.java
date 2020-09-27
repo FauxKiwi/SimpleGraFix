@@ -2,59 +2,112 @@ package com.siinus.simpleGrafix;
 
 import com.siinus.simpleGrafix.input.Input;
 
-import javax.imageio.ImageIO;
 import javax.swing.*;
 import java.awt.*;
 import java.awt.image.BufferStrategy;
 import java.awt.image.BufferedImage;
-import java.io.File;
-import java.io.IOException;
+import java.awt.image.DataBufferInt;
 
-public class Window extends JFrame {
+public class Window {
     private int width, height;
+    private final int finalWidth, finalHeight;
     private float scale;
+    private final float finalScale;
+    private boolean scaleOnResize = false;
 
+    private JFrame frame;
     private BufferedImage image;
     private Canvas canvas;
     private BufferStrategy strategy;
     private Graphics graphics;
 
     private Input input;
+    private GameLoop gameLoop;
 
-    public Window(String title, int width, int height, float scale) {
-        super(title);
+    private boolean resizing = false;
 
+    public Window(GameLoop gameLoop, String title, int width, int height, float scale) {
+        finalWidth = width;
+        finalHeight = height;
+        finalScale = scale;
+
+        this.gameLoop = gameLoop;
+
+        frame = new JFrame(title);
+
+        constructor(width, height, scale, true);
+
+        frame.setLocationRelativeTo(null);
+    }
+
+    private void constructor(int width, int height, float scale, boolean initFrame) {
         this.width = width;
         this.height = height;
         this.scale = scale;
 
-        initFrame();
+        if (initFrame) {
+            initFrame();
+        }
 
-        image = new BufferedImage(width, height, 1);
+        image = new BufferedImage((int) (width / scale), (int) (height / scale), 1);
+
+        if (!initFrame) {
+            frame.remove(canvas);
+        }
         canvas = new Canvas();
-        canvas.setSize((int) (width * scale), (int) (height * scale));
-        add(canvas, BorderLayout.CENTER);
-        pack();
-        setLocationRelativeTo(null);
+        canvas.setSize(width, height);
+        frame.add(canvas, BorderLayout.CENTER);
+        frame.pack();
 
         canvas.createBufferStrategy(2);
         strategy = canvas.getBufferStrategy();
         graphics = strategy.getDrawGraphics();
 
+        if (!initFrame) {
+            gameLoop.getRenderer().width = (int) (width / scale);
+            gameLoop.getRenderer().height = (int) (height / scale);
+            gameLoop.getRenderer().pixels = ((DataBufferInt) this.getImage().getRaster().getDataBuffer()).getData();
+
+            canvas.removeKeyListener(input);
+            canvas.removeMouseListener(input);
+            canvas.removeMouseMotionListener(input);
+            canvas.removeMouseWheelListener(input);
+        }
+
         input = new Input(this);
     }
 
     private void initFrame() {
-        setDefaultCloseOperation(EXIT_ON_CLOSE);
-        setLayout(new BorderLayout());
-        setSize(width,height);
-        setResizable(false);
+        frame.setDefaultCloseOperation(WindowConstants.EXIT_ON_CLOSE);
+        frame.setLayout(new BorderLayout());
+        frame.setSize(width,height);
+        frame.setResizable(true);
     }
 
     public void update() {
+        if (frame.getWidth()-16 != width || frame.getHeight()-39 != height) {
+            width = frame.getWidth()-16;
+            height = frame.getHeight()-39;
+            if (!resizing) {
+                resizing = true;
+            }
+        } else {
+            if (resizing) {
+                resizing = false;
+                if (scaleOnResize) {
+                    scale = finalScale * (height<=width?((float) height) / ((float) finalHeight):((float) width) / ((float) finalWidth));
+                }
+                System.out.println("Resized frame to: "+(frame.getWidth()-16) + " x " + (frame.getHeight()-39));
+                constructor(frame.getWidth() - 16, frame.getHeight() - 39, scale, false);
+            }
+        }
         graphics.drawImage(image, 0, 0, canvas.getWidth(), canvas.getHeight(), null);
         strategy.show();
         input.update();
+    }
+
+    public JFrame getFrame() {
+        return frame;
     }
 
     public BufferedImage getImage() {
@@ -65,12 +118,10 @@ public class Window extends JFrame {
         return canvas;
     }
 
-    @Override
     public int getWidth() {
         return width;
     }
 
-    @Override
     public int getHeight() {
         return height;
     }
@@ -81,5 +132,21 @@ public class Window extends JFrame {
 
     public Input getInput() {
         return input;
+    }
+
+    public BufferStrategy getStrategy() {
+        return strategy;
+    }
+
+    public Graphics getGraphics() {
+        return this.graphics;
+    }
+
+    public void setScaleOnResize(boolean scaleOnResize) {
+        this.scaleOnResize = scaleOnResize;
+    }
+
+    public boolean isScaleOnResize() {
+        return scaleOnResize;
     }
 }

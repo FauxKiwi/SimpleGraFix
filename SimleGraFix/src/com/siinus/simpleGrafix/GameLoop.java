@@ -1,5 +1,7 @@
 package com.siinus.simpleGrafix;
 
+import java.awt.*;
+
 public class GameLoop implements Runnable {
     private Window window;
     private Renderer renderer;
@@ -9,6 +11,7 @@ public class GameLoop implements Runnable {
 
     private volatile boolean running;
     private final double CAP = 1.0/60.0;
+    private boolean capFps = true;
     private boolean render;
 
     public GameLoop(Program program) {
@@ -18,15 +21,20 @@ public class GameLoop implements Runnable {
     }
 
     public void start() {
-        window = new Window("Simple GraFix",1280,720,1);
+        window = new Window(this, "Simple GraFix",960,509,0.5f);
         if (program.icon!=null) {
-            window.setIconImage(program.icon.getImage());
+            window.getFrame().setIconImage(program.icon.getImage());
         }
         renderer = new Renderer(window);
-        window.setVisible(true);
-        window.setEnabled(true);
+        window.getFrame().setVisible(true);
+        window.getFrame().setEnabled(true);
+
+        program.window = window;
+        program.renderer = renderer;
 
         program.start();
+
+        capFps = program.capFps;
 
         thread = new Thread(this);
         thread.start();
@@ -75,7 +83,7 @@ public class GameLoop implements Runnable {
                 }
             }
 
-            if (render) {
+            if (!capFps || render) {
                 renderer.clear();
 
                 program.render();
@@ -97,7 +105,7 @@ public class GameLoop implements Runnable {
     }
 
     private void dispose() {
-        window.setVisible(false);
+        window.getFrame().setVisible(false);
         System.exit(0);
     }
 

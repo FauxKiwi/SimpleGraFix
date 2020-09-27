@@ -5,7 +5,10 @@ import com.siinus.simpleGrafix.input.Input;
 
 public abstract class Program {
     protected static GameLoop gameLoop;
+    Window window;
+    Renderer renderer;
     Image icon = null;
+    boolean capFps = true;
 
     protected final void init() {
         gameLoop = new GameLoop(this);
@@ -20,7 +23,7 @@ public abstract class Program {
     public abstract void stop();
 
     public final Window getWindow() {
-        return gameLoop.getWindow();
+        return window;
     }
 
     public final Input getInput() {
@@ -28,10 +31,14 @@ public abstract class Program {
     }
 
     public final Renderer getRenderer() {
-        return gameLoop.getRenderer();
+        return renderer;
     }
 
     protected final void setIconImage(Image icon) {
         this.icon = icon;
+    }
+
+    protected final void setCapFps(boolean capFps) {
+        this.capFps = capFps;
     }
 }

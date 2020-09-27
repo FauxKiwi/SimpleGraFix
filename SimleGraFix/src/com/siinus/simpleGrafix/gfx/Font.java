@@ -1,22 +1,27 @@
 package com.siinus.simpleGrafix.gfx;
 
-import java.awt.*;
-import java.awt.image.BufferedImage;
+import java.util.ArrayList;
 
 public class Font {
     private static Font STANDARD = new Font("/arial16.png",16, 19);
     public static final Font ARIAL16 = new Font("/arial16.png",16, 19);
-    public static final Font ARIAL32 = new Font("/arial32.png",32, 37);
-    public static final Font ALGERIAN32 = new Font("/algerian32.png",32, 37);
+    //public static final Font ARIAL32 = new Font("/arial32.png",32, 37);
+    //public static final Font ALGERIAN32 = new Font("/algerian32.png",32, 37);
 
-    private int chars;
-    private int size;
-    private int imageSize;
-    private char startChar;
+    private static ArrayList<String> fonts = new ArrayList<>();
 
-    private Image fontImage;
-    private int[] offsets;
-    private int[] widths;
+    private final int chars;
+    private final int size;
+    private final int imageSize;
+    private final char startChar;
+
+    private final Image fontImage;
+    private final int[] offsets;
+    private final int[] widths;
+
+    static {
+        fonts.add("arial16");
+    }
 
     public Font(String path, int size, int imageSize) {
         this(path, 0x100, size, imageSize, '\0');
@@ -44,16 +49,6 @@ public class Font {
                 unicode++;
             }
         }
-    }
-
-    private BufferedImage resize(BufferedImage srcimage, int new_width, int new_height) {
-        BufferedImage resizedImage = new BufferedImage(new_width, new_height, srcimage.getType());
-        Graphics2D g2 = resizedImage.createGraphics();
-        g2.setRenderingHint(RenderingHints.KEY_INTERPOLATION, RenderingHints.VALUE_INTERPOLATION_BILINEAR);
-        g2.drawImage(srcimage, 0, 0, new_width, new_height, null);
-        g2.dispose();
-
-        return resizedImage;
     }
 
     public int getChars() {
