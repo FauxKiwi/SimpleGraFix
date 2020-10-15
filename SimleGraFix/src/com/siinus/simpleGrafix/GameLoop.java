@@ -1,11 +1,17 @@
 package com.siinus.simpleGrafix;
 
-import java.awt.*;
-
+/**
+ * The main class of the api: The game loop.<br>
+ * This is a runnable that is executed by a thread and updates and renders the program.<br>
+ * It also holds the {@link com.siinus.simpleGrafix.Window} and the {@link com.siinus.simpleGrafix.Renderer}.
+ *
+ * @author Simon
+ * @since 1.0
+ */
 public class GameLoop implements Runnable {
-    private Window window;
-    private Renderer renderer;
-    private final Program program;
+    private com.siinus.simpleGrafix.Window window;
+    private com.siinus.simpleGrafix.Renderer renderer;
+    private final com.siinus.simpleGrafix.Program program;
 
     private Thread thread;
 
@@ -14,18 +20,20 @@ public class GameLoop implements Runnable {
     private boolean capFps = true;
     private boolean render;
 
-    public GameLoop(Program program) {
+    private int fps = 0;
+
+    GameLoop(Program program) {
         this.program = program;
 
         start();
     }
 
     public void start() {
-        window = new Window(this, "Simple GraFix",960,509,0.5f);
+        window = new com.siinus.simpleGrafix.Window(this, "Simple GraFix",960,509,0.5f);
         if (program.icon!=null) {
             window.getFrame().setIconImage(program.icon.getImage());
         }
-        renderer = new Renderer(window);
+        renderer = new com.siinus.simpleGrafix.Renderer(window);
         window.getFrame().setVisible(true);
         window.getFrame().setEnabled(true);
 
@@ -55,7 +63,6 @@ public class GameLoop implements Runnable {
         double timeU = 0;
 
         double timeF = 0;
-        int fps = 0;
         int frames = 0;
 
         while (running) {
@@ -73,13 +80,12 @@ public class GameLoop implements Runnable {
                 render = true;
 
                 program.update();
+                window.getInput().update();
 
                 if (timeF >= 1.0) {
                     timeF = 0;
                     fps = frames;
                     frames = 0;
-
-                    System.out.println("FPS: "+fps);
                 }
             }
 
@@ -109,18 +115,40 @@ public class GameLoop implements Runnable {
         System.exit(0);
     }
 
-    public Window getWindow() {
+    /**
+     * Returns the window of this program.
+     *
+     * @return The window
+     */
+    public com.siinus.simpleGrafix.Window getWindow() {
         return window;
     }
 
-    public Renderer getRenderer() {
+    /**
+     * Returns the renderer of this program.
+     *
+     * @return The renderer
+     */
+    public com.siinus.simpleGrafix.Renderer getRenderer() {
         return renderer;
     }
 
+    /**
+     * Sets the window of this program.<br>
+     * <b>Warning</b>: Do not use if you don't know what you're doing!
+     *
+     * @param window The new window
+     */
     public void setWindow(Window window) {
         this.window = window;
     }
 
+    /**
+     * Sets the renderer of this program.<br>
+     * <b>Warning</b>: Do not use if you don't know what you're doing!
+     *
+     * @param renderer The new renderer
+     */
     public void setRenderer(Renderer renderer) {
         this.renderer = renderer;
     }

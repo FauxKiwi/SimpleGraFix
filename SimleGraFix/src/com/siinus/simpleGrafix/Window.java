@@ -8,6 +8,13 @@ import java.awt.image.BufferStrategy;
 import java.awt.image.BufferedImage;
 import java.awt.image.DataBufferInt;
 
+/**
+ * The window of the game.
+ * An instance of this class is attached to the main window and can be accessed using {@link com.siinus.simpleGrafix.GameLoop#getWindow()}.
+ *
+ * @author Simon
+ * @since 1.0
+ */
 public class Window {
     private int width, height;
     private final int finalWidth, finalHeight;
@@ -22,10 +29,20 @@ public class Window {
     private Graphics graphics;
 
     private Input input;
-    private GameLoop gameLoop;
+    private com.siinus.simpleGrafix.GameLoop gameLoop;
 
     private boolean resizing = false;
 
+    /**
+     * Creates a new renderer object.<br>
+     * <b>Warning</b>: This should not be needed to be used.
+     *
+     * @param gameLoop The associated game loop
+     * @param title The title
+     * @param width The width
+     * @param height The height
+     * @param scale The scale (how many real pixels are one pixel in the program)
+     */
     public Window(GameLoop gameLoop, String title, int width, int height, float scale) {
         finalWidth = width;
         finalHeight = height;
@@ -84,6 +101,10 @@ public class Window {
         frame.setResizable(true);
     }
 
+    /**
+     * Updates the window.<br>
+     * Called in the game loop every tick.
+     */
     public void update() {
         if (frame.getWidth()-16 != width || frame.getHeight()-39 != height) {
             width = frame.getWidth()-16;
@@ -106,46 +127,101 @@ public class Window {
         input.update();
     }
 
+    /**
+     * Returns the associated {@link JFrame}.
+     *
+     * @return The JFrame
+     */
     public JFrame getFrame() {
         return frame;
     }
 
+    /**
+     * Returns the rendered {@link BufferedImage}.
+     *
+     * @return The image
+     */
     public BufferedImage getImage() {
         return image;
     }
 
+    /**
+     * Returns the associated {@link Canvas}.
+     *
+     * @return The canvas
+     */
     public Canvas getCanvas() {
         return canvas;
     }
 
+    /**
+     * Returns the width of the window.
+     *
+     * @return The width
+     */
     public int getWidth() {
         return width;
     }
 
+    /**
+     * Returns the height of the window.
+     *
+     * @return The height
+     */
     public int getHeight() {
         return height;
     }
 
+    /**
+     * Returns the scale of the window.
+     *
+     * @return The scale
+     */
     public float getScale() {
         return scale;
     }
 
+    /**
+     * Returns the associated {@link Input} manager.
+     *
+     * @return The input manager
+     */
     public Input getInput() {
         return input;
     }
 
+    /**
+     * Returns the associated {@link BufferStrategy}.
+     *
+     * @return The buffer strategy
+     */
     public BufferStrategy getStrategy() {
         return strategy;
     }
 
+    /**
+     * Returns the associated {@link Graphics}.
+     *
+     * @return The Java graphics
+     */
     public Graphics getGraphics() {
         return this.graphics;
     }
 
+    /**
+     * Sets if the window should scale on resizing. Defaults to false.
+     *
+     * @param scaleOnResize If the window scales on resize
+     */
     public void setScaleOnResize(boolean scaleOnResize) {
         this.scaleOnResize = scaleOnResize;
     }
 
+    /**
+     * Returns if the window scales on resizing.
+     *
+     * @return If the window scales on resize.
+     */
     public boolean isScaleOnResize() {
         return scaleOnResize;
     }

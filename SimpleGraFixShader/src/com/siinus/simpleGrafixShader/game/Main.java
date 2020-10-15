@@ -1,4 +1,4 @@
-package com.siinus.simpleGrafix.game;
+package com.siinus.simpleGrafixShader.game;
 
 import com.siinus.simpleGrafix.Program;
 import com.siinus.simpleGrafix.gfx.Font;

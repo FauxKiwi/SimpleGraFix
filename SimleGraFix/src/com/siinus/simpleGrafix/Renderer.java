@@ -9,23 +9,48 @@ import org.jetbrains.annotations.Nullable;
 import java.awt.image.DataBufferInt;
 import java.util.Arrays;
 
+/**
+ * The renderer that renders the whole program.
+ * An instance of this class is attached to the main window and can be accessed using {@link GameLoop#getRenderer()}.
+ *
+ * @author Simon
+ * @since 1.0
+ */
 public class Renderer {
     protected int width, height;
     protected int[] pixels;
     protected int bgColor;
 
-    public Renderer(Window window) {
+    /**
+     * Creates a new Renderer object.<br>
+     * <b>Warning</b>: This should not be needed to be used.
+     *
+     * @param window The associated window
+     */
+    public Renderer(@NotNull Window window) {
         width = (int) (window.getWidth() / window.getScale());
         height = (int) (window.getHeight() / window.getScale());
         pixels = ((DataBufferInt) window.getImage().getRaster().getDataBuffer()).getData();
     }
 
+    /**
+     * Clears the whole screen and fills it with the background color.
+     */
     public void clear() {
         Arrays.fill(pixels, bgColor);
     }
 
+    /**
+     * Is called before the actual rendering and can be used by shaders.
+     */
     public void process() { }
 
+    /**
+     * Sets a pixel of the screen to a certain color.
+     * @param x The x coordinate of the pixel
+     * @param y The y coordinate of the pixel
+     * @param value The new color
+     */
     public void setPixel(int x, int y, int value) {
         if ((x + y * width) >= pixels.length) {
             return;
@@ -79,6 +104,16 @@ public class Renderer {
         }
     }
 
+    /**
+     * The draw method.<br>
+     * Only for extension.
+     *
+     * @param offX The x offset
+     * @param offY The y offset
+     * @param width The width
+     * @param height The height
+     * @param pixelIndex How the pixels should be extracted from the array
+     */
     protected void draw(int offX, int offY, int width, int height, PixelIndexer pixelIndex) {
         for (int y = 0; y < height; y++) {
             for (int x = 0; x < width; x++) {
@@ -87,10 +122,20 @@ public class Renderer {
         }
     }
 
+    /**
+     * Returns the background color.
+     *
+     * @return the background color
+     */
     public int getBgColor() {
         return bgColor;
     }
 
+    /**
+     * Sets the background color.
+     *
+     * @param bgColor The new background color
+     */
     public void setBgColor(int bgColor) {
         this.bgColor = bgColor;
     }
